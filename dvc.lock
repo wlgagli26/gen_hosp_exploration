@@ -1,0 +1,19 @@
+schema: '2.0'
+stages:
+  data_acquisition:
+    cmd: "python src/acquire_data.py --raw_data data/Hospital_General_Info.xlsx --output_data
+      data/data_clean.parquet\n"
+    deps:
+    - path: data/Hospital_General_Info.xlsx
+      hash: md5
+      md5: fcbbe4eca0ee579c3c9d4cda288eb07c
+      size: 1022541
+    - path: src/acquire_data.py
+      hash: md5
+      md5: 7c0b82fa16b96f7bf730e997c9ab4c99
+      size: 3155
+    outs:
+    - path: data/data_clean.parquet
+      hash: md5
+      md5: 2b48061c754f52e7040e62eda824d83a
+      size: 409579
