@@ -1,0 +1,27 @@
+stages:
+  data_acquisition:
+    cmd: >
+      python src/acquire_data.py
+      --raw_data data/Hospital_General_Info.xlsx
+      --output_data data/data_clean.parquet
+    
+    deps:
+      - src/acquire_data.py
+      - data/Hospital_General_Info.xlsx
+
+    outs:
+      - data/data_clean.parquet
+
+  process_data:
+    cmd: >
+      python src/process_data.py
+      --clean_data data/data_clean.parquet
+      --proc_data data/processed/data_final.parquet
+    
+    deps:
+      - src/process_data.py
+      - data/data_clean.parquet
+
+    outs:
+      - data/processed/data_final.parquet
+
