@@ -16,7 +16,8 @@ Using dvc and uv for dependencies, this project creates the following reproducib
 
 `data_acquisition`
 
-The dataset is pulled into the variable space for future use. The dataset is then cleaned to ensure all data are in a consistent and usable format for analysis.
+The dataset is pulled into the variable space for future use. The dataset is then cleaned and some features engineered 
+to ensure all data are in a consistent and usable format for analysis.
 
 *inputs*:
     -`data/Hospital_General_Info.xlsx`
@@ -25,16 +26,4 @@ The dataset is pulled into the variable space for future use. The dataset is the
     -`data/data_clean.parquet`
 
 
-
-#### Feature Engineering:
-
-`process_data`
-
-The cleaned dataset is further processed to explore engineered features derived from the original data for analysis.
-
-*inputs*:
-    -`data/data_clean.parquet`
-
-*outputs*
-    -`data/processed/data_final.parquet`
 
