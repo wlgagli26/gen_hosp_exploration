@@ -10,10 +10,10 @@ stages:
       size: 1022541
     - path: src/acquire_data.py
       hash: md5
-      md5: 7c0b82fa16b96f7bf730e997c9ab4c99
-      size: 3155
+      md5: 0fd493799c6cb638d63bb731a8a9a4d1
+      size: 4464
     outs:
     - path: data/data_clean.parquet
       hash: md5
-      md5: 2b48061c754f52e7040e62eda824d83a
-      size: 409579
+      md5: 02b4aa9bf1f03aba442351a8102ee053
+      size: 432501

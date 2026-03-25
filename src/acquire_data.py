@@ -11,7 +11,8 @@ import numpy as np
 import pandas as pd
 
 
-
+feature_list = ['MORT Group Measure Count', 'Safety Group Measure Count', 'READM Group Measure Count',
+           'Pt Exp Group Measure Count', 'TE Group Measure Count']
 text_col = ['Facility Name', 'Address', 'City/Town', 'County/Parish']
 num_col = ['Hospital overall rating', 'MORT Group Measure Count', 'Count of Facility MORT Measures', 
            'Count of MORT Measures Better', 'Count of MORT Measures No Different', 'Count of MORT Measures Worse',
@@ -60,6 +61,29 @@ def norm_bool(c: pd.Series) -> pd.Series:
     return c
 
 
+def engineer_feats(main: pd.DataFrame) -> pd.DataFrame:
+
+    for feat in feature_list:
+        if "MORT" in feat:
+            main["MORT_fac_rate"] = main["Count of Facility MORT Measures"] / main[feat]
+            main["MORT_bet_rate"] = main["Count of MORT Measures Better"] / main["Count of Facility MORT Measures"]
+
+        elif "Safety" in feat:
+            main["Safety_fac_rate"] = main["Count of Facility Safety Measures"] / main[feat]
+            main["Safety_bet_rate"] = main["Count of Safety Measures Better"] / main["Count of Facility Safety Measures"]
+
+        elif "READM" in feat:
+            main["READM_fac_rate"] = main["Count of Facility READM Measures"] / main[feat]
+            main["READM_bet_rate"] = main["Count of READM Measures Better"] / main["Count of Facility READM Measures"]
+        
+        elif "Pt Exp" in feat:
+            main["PtExp_fac_rate"] = main["Count of Facility Pt Exp Measures"] / main[feat]
+                  
+        elif "TE" in feat:
+            main["TE_fac_rate"] = main["Count of Facility TE Measures"] / main[feat]
+        
+    return main
+
 
 def main():
         
@@ -85,11 +109,12 @@ def main():
     for col in bool_col:
         raw_data[col] = norm_bool(raw_data[col])
 
+    clean_data = engineer_feats(raw_data)
 
     # Write outputs to file
     output_path = Path(args.output_data)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    raw_data.to_parquet(output_path)    
+    clean_data.to_parquet(output_path)    
 
     print("Written to file:", str(output_path))
 
