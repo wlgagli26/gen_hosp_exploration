@@ -1,19 +1,36 @@
 schema: '2.0'
 stages:
   data_acquisition:
-    cmd: "python src/acquire_data.py --raw_data data/Hospital_General_Info.xlsx --output_data
-      data/data_clean.parquet\n"
+    cmd: "python src/acquire_data.py --raw_data data/raw/Hospital_General_Info.xlsx
+      --output_data data/processed/data_clean.parquet\n"
     deps:
-    - path: data/Hospital_General_Info.xlsx
+    - path: data/raw/Hospital_General_Info.xlsx
       hash: md5
       md5: fcbbe4eca0ee579c3c9d4cda288eb07c
       size: 1022541
     - path: src/acquire_data.py
       hash: md5
-      md5: 0fd493799c6cb638d63bb731a8a9a4d1
-      size: 4464
+      md5: 3870352754f640e2777e5c4f4a00a17a
+      size: 3332
     outs:
-    - path: data/data_clean.parquet
+    - path: data/processed/data_clean.parquet
       hash: md5
-      md5: 02b4aa9bf1f03aba442351a8102ee053
-      size: 432501
+      md5: 5c1d0d2d395eef6b37a33e1971b0d544
+      size: 410753
+  preprocess_data:
+    cmd: "python src/preprocess_data.py --clean_data data/processed/data_clean.parquet
+      --proc_data data/processed/data_final.parquet\n"
+    deps:
+    - path: data/processed/data_clean.parquet
+      hash: md5
+      md5: 5c1d0d2d395eef6b37a33e1971b0d544
+      size: 410753
+    - path: src/preprocess_data.py
+      hash: md5
+      md5: 3e7e512b28d6d94e0aeb06986a093e40
+      size: 2018
+    outs:
+    - path: data/processed/data_final.parquet
+      hash: md5
+      md5: bf1a812a3e4832a26477af2f6315a70c
+      size: 433675

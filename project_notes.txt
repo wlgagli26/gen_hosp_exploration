@@ -1,0 +1,29 @@
+first tried to split data acquisition and feature engineering. then combined them. then realized that for future purposes of data changes and buildout, having it as a separate stage is better. 
+
+Research questions:
+-do any measures scoring "better" predict overall hospital rating?
+-do any measures scoring "better" predict overall birth readiness?
+
+EDA to do:
+-descriptive stats including missingness (a some of the measures include almost 50% missingness, including hospital rating target)
+**birthing friendly target not necessarily true because there may be missingness that is housed in the data--need to check this prior to converting it--do in report for stage 1
+THe footnotes can be ignored for now, plot distributions for measures of interest and targets.
+-distributions
+-crosstab/correlations
+
+
+Other considerations:
+-generate reports from data_acq and preprocessing stages (e.g., data_acq can report out what files were combined, the initial sizes, then overall final size, preprocessing can report out missingness, averages, etc.)
+-Tableau geo mapping?
+-add another dataset (e.g. census/population data)
+
+
+Need to think more about visualizations for EDA
+-distributions of facility measures for each category
+-bar graph of overall measure counts
+-distributions of better measures for each category
+
+**NEED TO FIX birthing criteria issue--
+1 - may not be representative (missing != False necessarily)
+
+Need to add files to .dvcignore (check ekstrand's template)
