@@ -10,27 +10,68 @@ stages:
       size: 1022541
     - path: src/acquire_data.py
       hash: md5
-      md5: 3870352754f640e2777e5c4f4a00a17a
-      size: 3332
+      md5: 9617e684e1d3063add2b931a1a1dcbe5
+      size: 3852
     outs:
     - path: data/processed/data_clean.parquet
       hash: md5
-      md5: 5c1d0d2d395eef6b37a33e1971b0d544
-      size: 410753
+      md5: 604ae1761fca3318d30f006896097668
+      size: 413288
   preprocess_data:
     cmd: "python src/preprocess_data.py --clean_data data/processed/data_clean.parquet
       --proc_data data/processed/data_final.parquet\n"
     deps:
     - path: data/processed/data_clean.parquet
       hash: md5
-      md5: 5c1d0d2d395eef6b37a33e1971b0d544
-      size: 410753
+      md5: 604ae1761fca3318d30f006896097668
+      size: 413288
     - path: src/preprocess_data.py
       hash: md5
-      md5: 3e7e512b28d6d94e0aeb06986a093e40
-      size: 2018
+      md5: ebf11c0755bac2b8073587bd159e6798
+      size: 2048
     outs:
     - path: data/processed/data_final.parquet
       hash: md5
-      md5: bf1a812a3e4832a26477af2f6315a70c
-      size: 433675
+      md5: 3365995c5f9b975deff3e91558c0281f
+      size: 436210
+  split_data:
+    cmd: "python src/split_data.py --get_data data/processed/data_final.parquet --output_train
+      data/processed/train_data.parquet --output_test data/processed/test_data.parquet\n"
+    deps:
+    - path: data/processed/data_final.parquet
+      hash: md5
+      md5: 3365995c5f9b975deff3e91558c0281f
+      size: 436210
+    - path: src/split_data.py
+      hash: md5
+      md5: d2f5ea385fd4e7c6e3af313735fbedb4
+      size: 3202
+    outs:
+    - path: data/processed/test_data.parquet
+      hash: md5
+      md5: a3cecd7f4d36efeef1fe4f3471aff296
+      size: 49135
+    - path: data/processed/train_data.parquet
+      hash: md5
+      md5: 29b0670e36e5e374419d7d6fb9ce661a
+      size: 124669
+  eda_notebook:
+    cmd: "mkdir -p reports && python -m papermill notebooks/eda_notebook.ipynb reports/eda_report.ipynb\n"
+    deps:
+    - path: data/processed/data_final.parquet
+      hash: md5
+      md5: 3365995c5f9b975deff3e91558c0281f
+      size: 436210
+    - path: data/raw/Hospital_General_Info.xlsx
+      hash: md5
+      md5: fcbbe4eca0ee579c3c9d4cda288eb07c
+      size: 1022541
+    - path: notebooks/eda_notebook.ipynb
+      hash: md5
+      md5: 1d8ce715ed469c7925cb1707dc435724
+      size: 1075191
+    outs:
+    - path: reports/eda_report.ipynb
+      hash: md5
+      md5: 7c237fb3142b75a2db89307d626c9300
+      size: 1087920

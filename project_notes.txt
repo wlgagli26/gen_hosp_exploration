@@ -5,7 +5,8 @@ Research questions:
 -do any measures scoring "better" predict overall birth readiness?
 
 EDA to do:
--descriptive stats including missingness (a some of the measures include almost 50% missingness, including hospital rating target)
+-descriptive stats including missingness (as some of the measures include almost 50% missingness, including hospital rating target--almost 800 are the 4-5 hospital types that were not rated--find out why these werent rated)
+-rating by hospital type boxplot (noted that only 3 hospital types have ratings-- acute care, acute VA, and critical care)
 **birthing friendly target not necessarily true because there may be missingness that is housed in the data--need to check this prior to converting it--do in report for stage 1
 THe footnotes can be ignored for now, plot distributions for measures of interest and targets.
 -distributions
@@ -13,15 +14,17 @@ THe footnotes can be ignored for now, plot distributions for measures of interes
 
 
 Other considerations:
+-when splitting data, need to consider missingness--drop NA from there. Consider log transform if neeeded but planning to use trees so probably not important to transform
 -generate reports from data_acq and preprocessing stages (e.g., data_acq can report out what files were combined, the initial sizes, then overall final size, preprocessing can report out missingness, averages, etc.)
 -Tableau geo mapping?
 -add another dataset (e.g. census/population data)
 
 
 Need to think more about visualizations for EDA
--distributions of facility measures for each category
--bar graph of overall measure counts
--distributions of better measures for each category
+-DONE distributions of facility measures for each category
+-DONE bar graph of overall measure counts
+-DONE distributions of better measures for each category
+-explore what is going on with pt exp measures (8 only?, yes, this is true. Wonder if there is some rule about this?)
 
 **NEED TO FIX birthing criteria issue--
 1 - may not be representative (missing != False necessarily)

@@ -58,9 +58,14 @@ def norm_cat(c: pd.Series) -> pd.Series:
 def norm_bool(c: pd.Series) -> pd.Series:
     """Normalize boolean columns into bool format"""
     c = c.astype("string").str.strip().str.casefold().isin(["yes", "y"])
-    
     return c
 
+'''
+s = df["Meets criteria for birthing friendly designation"].astype("string").str.strip().str.casefold()
+
+df["birth_friendly_yes"] = s.eq("yes")
+df["birth_friendly_missing"] = s.isna() | s.eq("")
+'''
 
 
 def main():
@@ -85,7 +90,13 @@ def main():
         raw_data[col] = norm_cat(raw_data[col])    
 
     for col in bool_col:
-        raw_data[col] = norm_bool(raw_data[col])
+        if col == "Meets criteria for birthing friendly designation":
+            c = raw_data[col].astype("string").str.strip().str.casefold()
+            c = c.replace("", pd.NA)
+            raw_data["birth_friendly_YES"] = c.isin(["yes", "y"])
+            raw_data["birth_friendly_MISSING"] = c.isna()
+        else:
+            raw_data[col] = norm_bool(raw_data[col])
 
    
     # Write outputs to file
