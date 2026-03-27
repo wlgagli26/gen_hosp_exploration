@@ -1,2 +1,4 @@
 /data_final.parquet
 /data_clean.parquet
+/train_data.parquet
+/test_data.parquet

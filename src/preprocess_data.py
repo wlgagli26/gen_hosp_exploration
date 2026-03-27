@@ -19,22 +19,22 @@ def engineer_feats(main: pd.DataFrame) -> pd.DataFrame:
 
     for feat in feature_list:
         if "MORT" in feat:
-            main["MORT_fac_rate"] = main["Count of Facility MORT Measures"] / main[feat]
+            main["MORT_fac_rate"] = main["Count of Facility MORT Measures"] / main[feat].max()
             main["MORT_bet_rate"] = main["Count of MORT Measures Better"] / main["Count of Facility MORT Measures"]
 
         elif "Safety" in feat:
-            main["Safety_fac_rate"] = main["Count of Facility Safety Measures"] / main[feat]
+            main["Safety_fac_rate"] = main["Count of Facility Safety Measures"] / main[feat].max()
             main["Safety_bet_rate"] = main["Count of Safety Measures Better"] / main["Count of Facility Safety Measures"]
 
         elif "READM" in feat:
-            main["READM_fac_rate"] = main["Count of Facility READM Measures"] / main[feat]
+            main["READM_fac_rate"] = main["Count of Facility READM Measures"] / main[feat].max()
             main["READM_bet_rate"] = main["Count of READM Measures Better"] / main["Count of Facility READM Measures"]
         
         elif "Pt Exp" in feat:
-            main["PtExp_fac_rate"] = main["Count of Facility Pt Exp Measures"] / main[feat]
+            main["PtExp_fac_rate"] = main["Count of Facility Pt Exp Measures"] / main[feat].max()
                   
         elif "TE" in feat:
-            main["TE_fac_rate"] = main["Count of Facility TE Measures"] / main[feat]
+            main["TE_fac_rate"] = main["Count of Facility TE Measures"] / main[feat].max()
         
     return main
 
