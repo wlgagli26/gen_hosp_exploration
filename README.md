@@ -25,5 +25,38 @@ to ensure all data are in a consistent and usable format for analysis.
 *outputs*:
     -`data/data_clean.parquet`
 
+`preprocess_data`
 
+*inputs*
+    -`data/processed/data_clean.parquet`
+      
+*outputs*
+    -`data/processed/data_final.parquet`
+    
+    deps:
+      - src/preprocess_data.py
+      - data/processed/data_clean.parquet
 
+    outs:
+      - data/processed/data_final.parquet
+
+#### Exploratory Data Analysis:
+
+`eda_notebook`
+
+*inputs*
+    -`data/processed/data_final.parquet`
+    -`data/raw/Hospital_General_Info.xlsx`
+*outputs*
+    -`reports/eda_report.ipynb`
+
+#### Data Splitting:
+
+`split_data`
+
+*inputs*
+    -`data/processed/data_final.parquet`
+
+*outputs*
+    -`data/processed/train_data.parquet`
+    -`data/processed/test_data.parquet`
