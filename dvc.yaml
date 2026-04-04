@@ -57,3 +57,73 @@ stages:
       - data/processed/train_data.parquet
       - data/processed/test_data.parquet
 
+
+  train_rf_model:
+    cmd: >
+      python src/models.py
+      --select_model rf
+      --train_data data/processed/train_data.parquet
+      --test_data data/processed/test_data.parquet
+      --preds preds/rf_preds.parquet
+      --models models/rfr.joblib
+      --random_seed 75
+    
+    deps:
+      - src/models.py
+      - data/processed/train_data.parquet
+      - data/processed/test_data.parquet
+    
+    outs:
+      - models/rfr.joblib
+      - preds/rf_preds.parquet
+
+
+  train_xgb_model:
+    cmd: >
+      python src/models.py
+      --select_model xgb
+      --train_data data/processed/train_data.parquet
+      --test_data data/processed/test_data.parquet
+      --preds preds/xgb_preds.parquet
+      --models models/xgb.joblib
+      --random_seed 75
+    
+    deps:
+      - src/models.py
+      - data/processed/train_data.parquet
+      - data/processed/test_data.parquet
+    
+    outs:
+      - models/xgb.joblib
+      - preds/xgb_preds.parquet
+
+  evaluate_model:
+    cmd: >
+      python src/evaluate.py
+      --rf_preds preds/rf_preds.parquet
+      --xgb_preds preds/xgb_preds.parquet
+      --metrics_out metrics/metrics_report.json
+
+    deps:
+      - src/evaluate.py
+      - preds/rf_preds.parquet
+      - preds/xgb_preds.parquet
+
+    outs:
+      - metrics/metrics_report.json
+
+
+  #stack_models:
+  #  cmd: >
+  #    python src/stack_models.py
+  #    --get_rf_model models/rfr.joblib
+  #    --get_xgb_model models/xgb.joblib
+
+#    deps:
+#      - models/rfr.joblib
+#      - models/xgb.joblib
+
+  
+
+
+

@@ -12,6 +12,8 @@ The purpose of this project is to create a version-controlled repository for exp
 
 Using dvc and uv for dependencies, this project creates the following reproducible **DVC workflow stages**:
 
+---
+
 #### Data Acquisition and Cleaning:
 
 `data_acquisition`
@@ -20,10 +22,47 @@ The dataset is pulled into the variable space for future use. The dataset is the
 to ensure all data are in a consistent and usable format for analysis.
 
 *inputs*:
-    -`data/Hospital_General_Info.xlsx`
+- `data/Hospital_General_Info.xlsx`
 
 *outputs*:
-    -`data/data_clean.parquet`
+- `data/data_clean.parquet`  
+  
+<br>
+  
+`preprocess_data`
 
+*inputs*:
+- `data/processed/data_clean.parquet`
+      
+*outputs*
+- `data/processed/data_final.parquet`
+    
+---
 
+#### Exploratory Data Analysis:
 
+The data is explored for distributions and trends to give insights into data splitting and modeling approaches as appropriate.
+
+`eda_notebook`
+
+*inputs*:
+- `data/processed/data_final.parquet`
+- `data/raw/Hospital_General_Info.xlsx`
+    
+*outputs*:
+- `reports/eda_report.ipynb`  
+  
+---  
+  
+#### Data Splitting:
+
+The data is split in preparation for analysis and output to separate train/test files for ease of modeling and reproducibility.
+
+`split_data`
+
+*inputs*:
+- `data/processed/data_final.parquet`
+
+*outputs*:
+- `data/processed/train_data.parquet`
+- `data/processed/test_data.parquet`
