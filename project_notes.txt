@@ -1,16 +1,21 @@
 first tried to split data acquisition and feature engineering. then combined them. then realized that for future purposes of data changes and buildout, having it as a separate stage is better. 
 
 Research questions:
--do any measures scoring "better" predict overall hospital rating?
--do any measures scoring "better" predict overall birth readiness?
+-do any measures scoring "better" predict overall hospital rating?--maybe just do any measures predict overall hospital rating?
+-do any measures scoring "better" predict overall birth friendly designation?
+--Stronger version:
+    1. Can I predict overall hospital rating?
+    2. Which features matter most in prediction? 
+    3. Do hospital features improve prediction of the overall hospital rating over using the outcome measures alone?
+    Drop birth-friendly because of missingness--can look at associations of birth friendly to hospital ratings and account for state and hospital type for example.
 
 EDA to do:
--descriptive stats including missingness (as some of the measures include almost 50% missingness, including hospital rating target--almost 800 are the 4-5 hospital types that were not rated--find out why these werent rated)
--rating by hospital type boxplot (noted that only 3 hospital types have ratings-- acute care, acute VA, and critical care)
-**birthing friendly target not necessarily true because there may be missingness that is housed in the data--need to check this prior to converting it--do in report for stage 1
-THe footnotes can be ignored for now, plot distributions for measures of interest and targets.
--distributions
--crosstab/correlations
+DONE-descriptive stats including missingness (as some of the measures include almost 50% missingness, including hospital rating target--almost 800 are the 4-5 hospital types that were not rated--find out why these werent rated)
+DONE -rating by hospital type boxplot (noted that only 3 hospital types have ratings-- acute care, acute VA, and critical care)
+DONE **birthing friendly target not necessarily true because there may be missingness that is housed in the data--need to check this prior to converting it--do in report for stage 1
+DONE -THe footnotes can be ignored for now, plot distributions for measures of interest and targets.
+DONE-distributions
+DONE-crosstab/correlations
 
 
 Other considerations:
@@ -27,6 +32,214 @@ Need to think more about visualizations for EDA
 -explore what is going on with pt exp measures (8 only?, yes, this is true. Wonder if there is some rule about this?)
 
 **NEED TO FIX birthing criteria issue--
-1 - may not be representative (missing != False necessarily)
+DONE 1 - may not be representative (missing != False necessarily)
 
+
+Still need to do:
 Need to add files to .dvcignore (check ekstrand's template)
+May need to drop NA from train data for hospital type
+Come back to model stacking for RFR and XGBR models. Regression is better than classification for this case due to the discrete rating data having meaning; however, results might be boosted with model tuning and also model stacking. Need to figure out how to stack models in the pipeline.
+For Later:
+OOF means out-of-fold predictions.
+
+It comes up in stacking because the stacking model should learn from base-model predictions that were made on data the base model did not train on.
+
+That is the whole point.
+
+The problem OOF solves
+
+Suppose you have training data and two base models:
+
+RF
+XGB
+
+If you do this:
+
+train RF on all training rows
+predict on those same training rows
+train the stacker on those predictions
+
+that is bad.
+
+Why? Because RF is predicting rows it already saw during training, so those predictions are unrealistically good. The stacker then learns from over-optimistic inputs and tends to overfit.
+
+OOF fixes that.
+
+What “fold” means
+
+In cross-validation, you split the training set into chunks called folds.
+
+Example with 5 folds:
+
+fold 1
+fold 2
+fold 3
+fold 4
+fold 5
+
+For each round:
+
+train on 4 folds
+predict on the 1 held-out fold
+
+That held-out fold is “out of fold” for that model fit.
+
+How OOF predictions are created
+
+Say you have training rows 1–100 and use 5-fold CV.
+
+Round 1
+train on folds 2, 3, 4, 5
+predict on fold 1
+Round 2
+train on folds 1, 3, 4, 5
+predict on fold 2
+Round 3
+train on folds 1, 2, 4, 5
+predict on fold 3
+
+and so on.
+
+At the end:
+
+every training row gets a prediction
+but that prediction came from a model that did not train on that row
+
+Those are the OOF predictions.
+
+Why that matters for stacking
+
+The stacker uses base-model predictions as features.
+
+So instead of training the stacker on “cheating” predictions from base models that saw the row already, you train it on OOF predictions, which are much closer to what happens on truly unseen data.
+
+Example training table for the stacker:
+
+rf_oof_pred   xgb_oof_pred   true_rating
+3.1           3.4            4
+2.2           2.0            2
+4.0           4.5            5
+...
+
+The stacker learns from these.
+
+Relation to train/test split
+
+Think of it as two levels of splitting.
+
+Outer split
+
+This is your normal split:
+
+train set
+test set
+
+The test set stays untouched until final evaluation.
+
+Inner split
+
+Inside the train set only, you do cross-validation folds to create OOF predictions.
+
+So the flow is:
+
+split full data into train and test
+inside train, create OOF predictions for RF and XGB using CV folds
+train the stacker on those OOF predictions
+train RF and XGB again on the full training set
+get RF and XGB predictions on the test set
+feed those test predictions into the trained stacker
+evaluate stacked predictions on the test set
+
+That is the clean stacking workflow.
+
+Why not use test data for stacker training
+
+Because then you leak evaluation data into training.
+
+The test set should only answer:
+
+“How good is the final stacked model on unseen data?”
+
+It should not help train base models or the meta-model.
+
+Concrete example
+
+Suppose you have 1,000 rows.
+
+Step 1: outer split
+800 train
+200 test
+Step 2: OOF on the 800 train rows
+
+Using 5 folds:
+
+each fold has about 160 rows
+for each fold, train on about 640 rows
+predict on the held-out 160
+
+Now every one of the 800 training rows gets:
+
+RF OOF prediction
+XGB OOF prediction
+Step 3: train stacker
+
+Train stacker on:
+
+800 rows:
+[rf_oof_pred, xgb_oof_pred] -> true target
+Step 4: final base-model test predictions
+
+Retrain RF and XGB on all 800 training rows.
+Then predict on the 200 test rows.
+
+Now for the test rows you have:
+
+rf_test_pred   xgb_test_pred
+
+Feed those into the stacker to get final stacked predictions.
+
+Why this is efficient in a pipeline
+
+This suggests a good division of artifacts:
+
+base model OOF predictions for train
+base model predictions for test
+fitted stacker model
+final stacked predictions
+
+That way you do not repeat work unnecessarily.
+
+Intuition
+
+OOF predictions are like “practice exam scores from graders who had not seen the answer key for that student.”
+
+In-sample train predictions are like “scores from a grader who already memorized that student’s paper.”
+
+The second one looks better than reality and is not trustworthy for training the stacker.
+
+For your project
+
+Because your target is ordinal 1–5, the clean version is probably:
+
+base models: regression RF and regression XGB
+OOF predictions from both on train
+stacker: simple regressor like Ridge
+final stacked prediction rounded/clipped to 1–5 for reporting
+Minimal summary
+OOF = predictions for a training row made by a model that did not train on that row
+it is created with cross-validation inside the training set
+it prevents leakage when training the stacking model
+the test set remains untouched until the very end
+
+A compact pseudo-flow:
+
+split data into train, test
+
+for each base model:
+    make oof predictions on train using cv
+    fit model on full train
+    make predictions on test
+
+train stacker on train_oof_predictions
+predict test_final using base_model_test_predictions
+evaluate on test
