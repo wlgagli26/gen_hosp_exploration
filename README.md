@@ -1,4 +1,5 @@
 # General Hospital Exploration Using Version Control
+*By Virginia Muthard*
 
 ## Purpose
 
